@@ -68,20 +68,6 @@ func (lu *LinkUpdate) SetUpdatedAt(t time.Time) *LinkUpdate {
 	return lu
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (lu *LinkUpdate) SetOwnerID(id uuid.UUID) *LinkUpdate {
-	lu.mutation.SetOwnerID(id)
-	return lu
-}
-
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (lu *LinkUpdate) SetNillableOwnerID(id *uuid.UUID) *LinkUpdate {
-	if id != nil {
-		lu = lu.SetOwnerID(*id)
-	}
-	return lu
-}
-
 // SetOwner sets the "owner" edge to the User entity.
 func (lu *LinkUpdate) SetOwner(u *User) *LinkUpdate {
 	return lu.SetOwnerID(u.ID)
@@ -125,7 +111,18 @@ func (lu *LinkUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (lu *LinkUpdate) check() error {
+	if _, ok := lu.mutation.OwnerID(); lu.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Link.owner"`)
+	}
+	return nil
+}
+
 func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := lu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(link.Table, link.Columns, sqlgraph.NewFieldSpec(link.FieldID, field.TypeUUID))
 	if ps := lu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -133,9 +130,6 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := lu.mutation.OwnerID(); ok {
-		_spec.SetField(link.FieldOwnerID, field.TypeUUID, value)
 	}
 	if value, ok := lu.mutation.Original(); ok {
 		_spec.SetField(link.FieldOriginal, field.TypeString, value)
@@ -236,20 +230,6 @@ func (luo *LinkUpdateOne) SetUpdatedAt(t time.Time) *LinkUpdateOne {
 	return luo
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (luo *LinkUpdateOne) SetOwnerID(id uuid.UUID) *LinkUpdateOne {
-	luo.mutation.SetOwnerID(id)
-	return luo
-}
-
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (luo *LinkUpdateOne) SetNillableOwnerID(id *uuid.UUID) *LinkUpdateOne {
-	if id != nil {
-		luo = luo.SetOwnerID(*id)
-	}
-	return luo
-}
-
 // SetOwner sets the "owner" edge to the User entity.
 func (luo *LinkUpdateOne) SetOwner(u *User) *LinkUpdateOne {
 	return luo.SetOwnerID(u.ID)
@@ -306,7 +286,18 @@ func (luo *LinkUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (luo *LinkUpdateOne) check() error {
+	if _, ok := luo.mutation.OwnerID(); luo.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Link.owner"`)
+	}
+	return nil
+}
+
 func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) {
+	if err := luo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(link.Table, link.Columns, sqlgraph.NewFieldSpec(link.FieldID, field.TypeUUID))
 	id, ok := luo.mutation.ID()
 	if !ok {
@@ -331,9 +322,6 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := luo.mutation.OwnerID(); ok {
-		_spec.SetField(link.FieldOwnerID, field.TypeUUID, value)
 	}
 	if value, ok := luo.mutation.Original(); ok {
 		_spec.SetField(link.FieldOriginal, field.TypeString, value)

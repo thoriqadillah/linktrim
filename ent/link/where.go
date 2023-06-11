@@ -101,26 +101,6 @@ func OwnerIDNotIn(vs ...uuid.UUID) predicate.Link {
 	return predicate.Link(sql.FieldNotIn(FieldOwnerID, vs...))
 }
 
-// OwnerIDGT applies the GT predicate on the "owner_id" field.
-func OwnerIDGT(v uuid.UUID) predicate.Link {
-	return predicate.Link(sql.FieldGT(FieldOwnerID, v))
-}
-
-// OwnerIDGTE applies the GTE predicate on the "owner_id" field.
-func OwnerIDGTE(v uuid.UUID) predicate.Link {
-	return predicate.Link(sql.FieldGTE(FieldOwnerID, v))
-}
-
-// OwnerIDLT applies the LT predicate on the "owner_id" field.
-func OwnerIDLT(v uuid.UUID) predicate.Link {
-	return predicate.Link(sql.FieldLT(FieldOwnerID, v))
-}
-
-// OwnerIDLTE applies the LTE predicate on the "owner_id" field.
-func OwnerIDLTE(v uuid.UUID) predicate.Link {
-	return predicate.Link(sql.FieldLTE(FieldOwnerID, v))
-}
-
 // OriginalEQ applies the EQ predicate on the "original" field.
 func OriginalEQ(v string) predicate.Link {
 	return predicate.Link(sql.FieldEQ(FieldOriginal, v))

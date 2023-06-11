@@ -37,7 +37,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "link" package.
 	LinksInverseTable = "links"
 	// LinksColumn is the table column denoting the links relation/edge.
-	LinksColumn = "user_links"
+	LinksColumn = "owner_id"
 )
 
 // Columns holds all SQL columns for user fields.

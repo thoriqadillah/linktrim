@@ -36,7 +36,6 @@ type LinkMutation struct {
 	op            Op
 	typ           string
 	id            *uuid.UUID
-	owner_id      *uuid.UUID
 	original      *string
 	trimmed       *string
 	created_at    *time.Time
@@ -155,12 +154,12 @@ func (m *LinkMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 
 // SetOwnerID sets the "owner_id" field.
 func (m *LinkMutation) SetOwnerID(u uuid.UUID) {
-	m.owner_id = &u
+	m.owner = &u
 }
 
 // OwnerID returns the value of the "owner_id" field in the mutation.
 func (m *LinkMutation) OwnerID() (r uuid.UUID, exists bool) {
-	v := m.owner_id
+	v := m.owner
 	if v == nil {
 		return
 	}
@@ -186,7 +185,7 @@ func (m *LinkMutation) OldOwnerID(ctx context.Context) (v uuid.UUID, err error) 
 
 // ResetOwnerID resets all changes to the "owner_id" field.
 func (m *LinkMutation) ResetOwnerID() {
-	m.owner_id = nil
+	m.owner = nil
 }
 
 // SetOriginal sets the "original" field.
@@ -333,11 +332,6 @@ func (m *LinkMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by id.
-func (m *LinkMutation) SetOwnerID(id uuid.UUID) {
-	m.owner = &id
-}
-
 // ClearOwner clears the "owner" edge to the User entity.
 func (m *LinkMutation) ClearOwner() {
 	m.clearedowner = true
@@ -346,14 +340,6 @@ func (m *LinkMutation) ClearOwner() {
 // OwnerCleared reports if the "owner" edge to the User entity was cleared.
 func (m *LinkMutation) OwnerCleared() bool {
 	return m.clearedowner
-}
-
-// OwnerID returns the "owner" edge ID in the mutation.
-func (m *LinkMutation) OwnerID() (id uuid.UUID, exists bool) {
-	if m.owner != nil {
-		return *m.owner, true
-	}
-	return
 }
 
 // OwnerIDs returns the "owner" edge IDs in the mutation.
@@ -407,7 +393,7 @@ func (m *LinkMutation) Type() string {
 // AddedFields().
 func (m *LinkMutation) Fields() []string {
 	fields := make([]string, 0, 5)
-	if m.owner_id != nil {
+	if m.owner != nil {
 		fields = append(fields, link.FieldOwnerID)
 	}
 	if m.original != nil {

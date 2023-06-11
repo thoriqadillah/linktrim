@@ -36,6 +36,6 @@ func (Link) Indexes() []ent.Index {
 // Edges of the Link.
 func (Link) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("owner", User.Type).Ref("links").Unique(),
+		edge.From("owner", User.Type).Ref("links").Field("owner_id").Unique().Required(),
 	}
 }

@@ -77,20 +77,6 @@ func (lc *LinkCreate) SetNillableID(u *uuid.UUID) *LinkCreate {
 	return lc
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (lc *LinkCreate) SetOwnerID(id uuid.UUID) *LinkCreate {
-	lc.mutation.SetOwnerID(id)
-	return lc
-}
-
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (lc *LinkCreate) SetNillableOwnerID(id *uuid.UUID) *LinkCreate {
-	if id != nil {
-		lc = lc.SetOwnerID(*id)
-	}
-	return lc
-}
-
 // SetOwner sets the "owner" edge to the User entity.
 func (lc *LinkCreate) SetOwner(u *User) *LinkCreate {
 	return lc.SetOwnerID(u.ID)
@@ -158,6 +144,9 @@ func (lc *LinkCreate) check() error {
 	if _, ok := lc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Link.updated_at"`)}
 	}
+	if _, ok := lc.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Link.owner"`)}
+	}
 	return nil
 }
 
@@ -194,10 +183,6 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := lc.mutation.OwnerID(); ok {
-		_spec.SetField(link.FieldOwnerID, field.TypeUUID, value)
-		_node.OwnerID = value
-	}
 	if value, ok := lc.mutation.Original(); ok {
 		_spec.SetField(link.FieldOriginal, field.TypeString, value)
 		_node.Original = value
@@ -228,7 +213,7 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_links = &nodes[0]
+		_node.OwnerID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

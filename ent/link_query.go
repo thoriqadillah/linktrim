@@ -24,7 +24,6 @@ type LinkQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Link
 	withOwner  *UserQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -370,18 +369,11 @@ func (lq *LinkQuery) prepareQuery(ctx context.Context) error {
 func (lq *LinkQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Link, error) {
 	var (
 		nodes       = []*Link{}
-		withFKs     = lq.withFKs
 		_spec       = lq.querySpec()
 		loadedTypes = [1]bool{
 			lq.withOwner != nil,
 		}
 	)
-	if lq.withOwner != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, link.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Link).scanValues(nil, columns)
 	}
@@ -413,10 +405,7 @@ func (lq *LinkQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*L
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Link)
 	for i := range nodes {
-		if nodes[i].user_links == nil {
-			continue
-		}
-		fk := *nodes[i].user_links
+		fk := nodes[i].OwnerID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -433,7 +422,7 @@ func (lq *LinkQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*L
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_links" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "owner_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -466,6 +455,9 @@ func (lq *LinkQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != link.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if lq.withOwner != nil {
+			_spec.Node.AddColumnOnce(link.FieldOwnerID)
 		}
 	}
 	if ps := lq.predicates; len(ps) > 0 {

@@ -413,7 +413,9 @@ func (uq *UserQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*U
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(link.FieldOwnerID)
+	}
 	query.Where(predicate.Link(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.LinksColumn), fks...))
 	}))
@@ -422,13 +424,10 @@ func (uq *UserQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*U
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.user_links
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "user_links" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.OwnerID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_links" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "owner_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -11,12 +11,11 @@ var (
 	// LinksColumns holds the columns for the "links" table.
 	LinksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
-		{Name: "owner_id", Type: field.TypeUUID, Unique: true},
 		{Name: "original", Type: field.TypeString},
 		{Name: "trimmed", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "user_links", Type: field.TypeUUID, Nullable: true},
+		{Name: "owner_id", Type: field.TypeUUID},
 	}
 	// LinksTable holds the schema information for the "links" table.
 	LinksTable = &schema.Table{
@@ -26,9 +25,9 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "links_users_links",
-				Columns:    []*schema.Column{LinksColumns[6]},
+				Columns:    []*schema.Column{LinksColumns[5]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{
