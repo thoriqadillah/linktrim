@@ -8,13 +8,13 @@ import (
 )
 
 func main() {
+	db.Open()
+	defer db.Close()
+
 	app := fiber.New()
 	app.Use(logger.New())
 
-	db.Setup()
 	routes.Setup(app)
 
 	app.Listen(":8000")
-
-	defer db.DB().Close()
 }

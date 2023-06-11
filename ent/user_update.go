@@ -54,6 +54,20 @@ func (uu *UserUpdate) SetProfilePic(s string) *UserUpdate {
 	return uu
 }
 
+// SetNillableProfilePic sets the "profile_pic" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableProfilePic(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetProfilePic(*s)
+	}
+	return uu
+}
+
+// ClearProfilePic clears the value of the "profile_pic" field.
+func (uu *UserUpdate) ClearProfilePic() *UserUpdate {
+	uu.mutation.ClearProfilePic()
+	return uu
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (uu *UserUpdate) SetCreatedAt(t time.Time) *UserUpdate {
 	uu.mutation.SetCreatedAt(t)
@@ -163,6 +177,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.ProfilePic(); ok {
 		_spec.SetField(user.FieldProfilePic, field.TypeString, value)
 	}
+	if uu.mutation.ProfilePicCleared() {
+		_spec.ClearField(user.FieldProfilePic, field.TypeString)
+	}
 	if value, ok := uu.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -255,6 +272,20 @@ func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
 // SetProfilePic sets the "profile_pic" field.
 func (uuo *UserUpdateOne) SetProfilePic(s string) *UserUpdateOne {
 	uuo.mutation.SetProfilePic(s)
+	return uuo
+}
+
+// SetNillableProfilePic sets the "profile_pic" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableProfilePic(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetProfilePic(*s)
+	}
+	return uuo
+}
+
+// ClearProfilePic clears the value of the "profile_pic" field.
+func (uuo *UserUpdateOne) ClearProfilePic() *UserUpdateOne {
+	uuo.mutation.ClearProfilePic()
 	return uuo
 }
 
@@ -396,6 +427,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.ProfilePic(); ok {
 		_spec.SetField(user.FieldProfilePic, field.TypeString, value)
+	}
+	if uuo.mutation.ProfilePicCleared() {
+		_spec.ClearField(user.FieldProfilePic, field.TypeString)
 	}
 	if value, ok := uuo.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)

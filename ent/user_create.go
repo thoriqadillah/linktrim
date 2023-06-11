@@ -49,6 +49,14 @@ func (uc *UserCreate) SetProfilePic(s string) *UserCreate {
 	return uc
 }
 
+// SetNillableProfilePic sets the "profile_pic" field if the given value is not nil.
+func (uc *UserCreate) SetNillableProfilePic(s *string) *UserCreate {
+	if s != nil {
+		uc.SetProfilePic(*s)
+	}
+	return uc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetCreatedAt(t)
@@ -153,9 +161,6 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "User.password"`)}
-	}
-	if _, ok := uc.mutation.ProfilePic(); !ok {
-		return &ValidationError{Name: "profile_pic", err: errors.New(`ent: missing required field "User.profile_pic"`)}
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}
@@ -339,6 +344,12 @@ func (u *UserUpsert) UpdateProfilePic() *UserUpsert {
 	return u
 }
 
+// ClearProfilePic clears the value of the "profile_pic" field.
+func (u *UserUpsert) ClearProfilePic() *UserUpsert {
+	u.SetNull(user.FieldProfilePic)
+	return u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (u *UserUpsert) SetCreatedAt(v time.Time) *UserUpsert {
 	u.Set(user.FieldCreatedAt, v)
@@ -464,6 +475,13 @@ func (u *UserUpsertOne) SetProfilePic(v string) *UserUpsertOne {
 func (u *UserUpsertOne) UpdateProfilePic() *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdateProfilePic()
+	})
+}
+
+// ClearProfilePic clears the value of the "profile_pic" field.
+func (u *UserUpsertOne) ClearProfilePic() *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.ClearProfilePic()
 	})
 }
 
@@ -759,6 +777,13 @@ func (u *UserUpsertBulk) SetProfilePic(v string) *UserUpsertBulk {
 func (u *UserUpsertBulk) UpdateProfilePic() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdateProfilePic()
+	})
+}
+
+// ClearProfilePic clears the value of the "profile_pic" field.
+func (u *UserUpsertBulk) ClearProfilePic() *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.ClearProfilePic()
 	})
 }
 

@@ -22,7 +22,7 @@ func (User) Fields() []ent.Field {
 		field.String("name"),
 		field.String("email"),
 		field.String("password"),
-		field.String("profile_pic"),
+		field.String("profile_pic").Optional(),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at"),
 	}
