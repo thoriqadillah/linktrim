@@ -1,4 +1,4 @@
-package auth
+package model
 
 import (
 	"time"
@@ -7,13 +7,13 @@ import (
 )
 
 type (
-	userCreate struct {
+	UserCreate struct {
 		Name     string `json:"name" validate:"required,alpha,min=2,max=32"`
 		Email    string `json:"email" validate:"required,email,min=2,max=32"`
 		Password string `json:"password" validate:"required,alhpanum,min=6,max=16"`
 	}
 
-	userLogin struct {
+	UserLogin struct {
 		Email    string `json:"email" validate:"required,email,min=2,max=32"`
 		Password string `json:"password" validate:"required,alhpanum,min=6,max=16"`
 	}

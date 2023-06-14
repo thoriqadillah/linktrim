@@ -19,9 +19,14 @@ const (
 	dbname   = "linktrim"
 )
 
-var defaultkey = "default"
+var dbkey = "default"
 
-func Open() (*ent.Client, error) {
+func Open(key ...string) (*ent.Client, error) {
+	k := dbkey
+	if len(key) > 0 {
+		k = key[0]
+	}
+
 	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable", user, password, host, port, dbname)
 	client, err := ent.Open("postgres", dsn)
 	if err != nil {
@@ -37,18 +42,23 @@ func Open() (*ent.Client, error) {
 	// 	log.Panicf("Failed to migrate database: %s", err.Error())
 	// }
 
-	store.Store(defaultkey, client)
+	store.Store(k, client)
 	return client, nil
 }
 
-func DB() *ent.Client {
-	if v, ok := store.Load(defaultkey); ok {
+func DB(key ...string) *ent.Client {
+	k := dbkey
+	if len(key) > 0 {
+		k = key[0]
+	}
+
+	if v, ok := store.Load(k); ok {
 		return v.(*ent.Client)
 	}
 
 	db, err := Open()
 	if err != nil {
-		log.Printf(err.Error())
+		log.Panic(err.Error())
 		return nil
 	}
 

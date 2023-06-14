@@ -9,6 +9,7 @@ import (
 
 func main() {
 	db.Open()
+	db.SetupRedis()
 	defer db.Close()
 
 	app := fiber.New()
