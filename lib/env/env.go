@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Setup() {
+func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Panicf("Error loading env file: %s", err.Error())
 	}

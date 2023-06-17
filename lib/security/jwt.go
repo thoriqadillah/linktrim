@@ -3,6 +3,7 @@ package security
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -16,7 +17,7 @@ var (
 
 func EncodeJWT(userID string) string {
 	jwt := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":        exp,
+		"exp":        time.Now().Add(exp),
 		"authorized": true,
 		"user":       userID,
 	})
