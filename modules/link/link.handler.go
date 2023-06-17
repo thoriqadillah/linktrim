@@ -1,7 +1,112 @@
 package link
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"fmt"
+	"net/http"
 
-func CreateLink(ctx *fiber.Ctx) error {
-	return nil
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"github.com/thoriqadillah/linktrim/db"
+	"github.com/thoriqadillah/linktrim/lib/helper"
+	"github.com/thoriqadillah/linktrim/modules/account/model"
+)
+
+var storer = NewStore(db.DB())
+
+func CreateLink(c *fiber.Ctx) error {
+	user := c.UserContext().Value("user").(*model.User)
+	var payload linkCreate
+
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(http.StatusBadRequest).
+			JSON(helper.ErrorResponse(
+				fmt.Sprintf("Error parsing request body: %s", err.Error()),
+			))
+	}
+
+	payload.Owner = user.ID
+	if err := storer.Create(c.Context(), payload); err != nil {
+		return c.Status(http.StatusBadRequest).
+			JSON(helper.ErrorResponse(
+				fmt.Sprintf("Error creating link: %s", err.Error()),
+			))
+	}
+
+	return c.Status(http.StatusCreated).
+		JSON(helper.SuccessResponse(1))
+}
+
+func GetLinks(c *fiber.Ctx) error {
+	user := c.UserContext().Value("user").(*model.User)
+
+	links, err := storer.GetAll(c.Context(), user.ID, helper.Paginate(c))
+	if err != nil {
+		return c.Status(http.StatusNotFound).
+			JSON(helper.ErrorResponse(err.Error()))
+	}
+
+	return c.Status(http.StatusOK).
+		JSON(helper.SuccessResponse(links))
+}
+
+func GetOneLink(c *fiber.Ctx) error {
+	id := c.Params("id")
+	linkID, err := uuid.Parse(id)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).
+			JSON(helper.ErrorResponse(
+				fmt.Sprintf("Error parsing UUID: %s", err.Error()),
+			))
+	}
+
+	link, err := storer.GetOne(c.Context(), linkID)
+	if err != nil {
+		return c.Status(http.StatusNotFound).
+			JSON(helper.ErrorResponse(err.Error()))
+	}
+
+	return c.Status(http.StatusOK).
+		JSON(helper.SuccessResponse(link))
+}
+func UpdateLink(c *fiber.Ctx) error {
+	id := c.Params("id")
+	linkID, err := uuid.Parse(id)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).
+			JSON(helper.ErrorResponse(
+				fmt.Sprintf("Error parsing UUID: %s", err.Error()),
+			))
+	}
+
+	var payload linkUpdate
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(http.StatusBadRequest).
+			JSON(helper.ErrorResponse(err.Error()))
+	}
+
+	if err := storer.Update(c.Context(), linkID, payload); err != nil {
+		return c.Status(http.StatusBadRequest).
+			JSON(helper.ErrorResponse(err.Error()))
+	}
+
+	return c.Status(http.StatusOK).
+		JSON(helper.SuccessResponse(id))
+}
+
+func DeleteLink(c *fiber.Ctx) error {
+	id := c.Params("id")
+	linkID, err := uuid.Parse(id)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).
+			JSON(helper.ErrorResponse(
+				fmt.Sprintf("Error parsing UUID: %s", err.Error()),
+			))
+	}
+
+	if err := storer.Delete(c.Context(), linkID); err != nil {
+		return c.Status(http.StatusBadRequest).
+			JSON(helper.ErrorResponse(err.Error()))
+	}
+	return c.Status(http.StatusOK).
+		JSON(helper.SuccessResponse(id))
 }

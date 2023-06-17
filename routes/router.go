@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	account "github.com/thoriqadillah/linktrim/modules/account/routes"
-	link "github.com/thoriqadillah/linktrim/modules/link/routes"
+	"github.com/thoriqadillah/linktrim/modules/link"
 )
 
 func Setup(app *fiber.App) {

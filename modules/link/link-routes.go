@@ -1,4 +1,4 @@
-package routes
+package link
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -8,7 +8,9 @@ import (
 func Routes(r fiber.Router) {
 	router := r.Group("/link", middleware.Auth)
 
-	router.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("hemlo")
-	})
+	router.Get("/", GetLinks)
+	router.Get("/:id", GetOneLink)
+	router.Post("/", CreateLink)
+	router.Put("/:id", UpdateLink)
+	router.Delete("/:id", DeleteLink)
 }
