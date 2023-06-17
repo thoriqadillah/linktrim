@@ -47,5 +47,4 @@ func Auth(c *fiber.Ctx) error {
 	c.SetUserContext(ctx)
 
 	return c.Next()
-
 }

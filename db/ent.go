@@ -7,19 +7,15 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/thoriqadillah/linktrim/ent"
-)
-
-var store sync.Map
-
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "th0r1q"
-	dbname   = "linktrim"
+	"github.com/thoriqadillah/linktrim/lib/env"
 )
 
 var dbkey = "default"
+var store sync.Map
+var (
+	driver = env.Get("DB_DRIVER").ToString()
+	dsn    = env.Get("DB_DSN").ToString()
+)
 
 func Open(key ...string) (*ent.Client, error) {
 	k := dbkey
@@ -27,8 +23,7 @@ func Open(key ...string) (*ent.Client, error) {
 		k = key[0]
 	}
 
-	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable", user, password, host, port, dbname)
-	client, err := ent.Open("postgres", dsn)
+	client, err := ent.Open(driver, dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup database connection: %s", err.Error())
 	}

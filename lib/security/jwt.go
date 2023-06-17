@@ -1,32 +1,27 @@
 package security
 
 import (
-	"encoding/base64"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/thoriqadillah/linktrim/lib/env"
 )
 
-var defaultkey = "default"
+var (
+	key = env.Get("JWT_KEY").ToBytes()
+	exp = env.Get("JWT_EXP").ToDuration()
+)
 
 func EncodeJWT(userID string) string {
 	jwt := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":        time.Duration(24 * time.Hour),
+		"exp":        exp,
 		"authorized": true,
 		"user":       userID,
 	})
 
-	//TODO: generate public key
-	_, err := base64.URLEncoding.DecodeString("oRIU9Idp91hsO_taulZ8LRbxvwAYvoiteoj7prWj944=")
-	if err != nil {
-		log.Panicf("Could not decode key: %s", err.Error())
-		return ""
-	}
-
-	token, err := jwt.SignedString([]byte(defaultkey))
+	token, err := jwt.SignedString(key)
 	if err != nil {
 		log.Printf("Could not encode into token: %s", err.Error())
 		return ""
@@ -41,7 +36,7 @@ func DecodeJWT(token string) (userID uuid.UUID, err error) {
 			return nil, fmt.Errorf("signing method invalid")
 		}
 
-		return []byte(defaultkey), nil
+		return key, nil
 	})
 
 	if err != nil {

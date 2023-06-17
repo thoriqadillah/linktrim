@@ -4,9 +4,15 @@ import (
 	"log"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/thoriqadillah/linktrim/lib/env"
 )
 
 var rediskey = "redis"
+var (
+	addr     = env.Get("REDIS_ADDR").ToString()
+	password = env.Get("REDIS_PASSWORD").ToString()
+	db       = env.Get("REDIS_DB").ToInt()
+)
 
 func Redis(key ...string) *redis.Client {
 	k := rediskey
@@ -30,9 +36,9 @@ func SetupRedis(key ...string) {
 	}
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     addr,
+		Password: password,
+		DB:       db,
 	})
 
 	store.Store(k, client)
