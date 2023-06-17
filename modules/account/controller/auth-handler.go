@@ -16,6 +16,12 @@ import (
 
 var storer = store.NewStore(db.DB())
 
+func GetUser(c *fiber.Ctx) error {
+	user := c.UserContext().Value("user").(*model.User)
+	return c.Status(http.StatusOK).
+		JSON(helper.SuccessResponse(user))
+}
+
 func Register(c *fiber.Ctx) error {
 	var user model.UserCreate
 	if err := c.BodyParser(&user); err != nil {

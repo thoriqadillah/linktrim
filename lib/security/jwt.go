@@ -17,7 +17,7 @@ var (
 
 func EncodeJWT(userID string) string {
 	jwt := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":        time.Now().Add(exp),
+		"exp":        time.Now().Add(exp).Unix(),
 		"authorized": true,
 		"user":       userID,
 	})
