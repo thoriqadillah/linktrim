@@ -9,7 +9,6 @@ import (
 	"github.com/thoriqadillah/linktrim/lib/env"
 )
 
-// TODO: get to know how to update the value without updating the TTL
 type redisCache struct {
 	client *redis.Client
 }
@@ -42,7 +41,7 @@ func (c *redisCache) Get(ctx context.Context, key string) ([]byte, error) {
 }
 
 func (c *redisCache) Set(ctx context.Context, key string, value []byte, duration ...time.Duration) error {
-	exp := time.Duration(0)
+	exp := time.Duration(-1)
 	if len(duration) > 0 {
 		exp = duration[0]
 	}
