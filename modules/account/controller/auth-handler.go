@@ -10,11 +10,14 @@ import (
 	"github.com/thoriqadillah/linktrim/modules/account/store"
 
 	"github.com/thoriqadillah/linktrim/lib/cache"
+	"github.com/thoriqadillah/linktrim/lib/env"
 	"github.com/thoriqadillah/linktrim/lib/helper"
 	"github.com/thoriqadillah/linktrim/lib/security"
 )
 
 var storer = store.NewStore(db.DB())
+var cacheProvider = env.Get("CACHE_PROVIDER").ToString("redis")
+var exp = env.Get("JWT_EXP").ToDuration()
 
 func GetUser(c *fiber.Ctx) error {
 	user := c.UserContext().Value("user").(*model.User)
@@ -59,8 +62,8 @@ func Login(c *fiber.Ctx) error {
 			JSON(helper.ErrorResponse(err.Error()))
 	}
 
-	cache := cache.NewUserCache()
-	if err := cache.Set(c.Context(), user.ID.String(), toCache); err != nil {
+	cache := cache.New(cacheProvider)
+	if err := cache.Set(c.Context(), user.ID.String(), toCache, exp); err != nil {
 		return c.Status(http.StatusInternalServerError).
 			JSON(helper.ErrorResponse(err.Error()))
 	}

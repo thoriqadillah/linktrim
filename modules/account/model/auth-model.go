@@ -19,12 +19,12 @@ type (
 	}
 
 	User struct {
-		ID         uuid.UUID `json:"id"`
-		Name       string    `json:"name"`
-		Email      string    `json:"email"`
-		Password   string    `json:"-"`
-		ProfilePic string    `json:"profile_pic"`
-		CreatedAt  time.Time `json:"created_at"`
-		UpdatedAt  time.Time `json:"updated_at"`
+		ID         uuid.UUID `json:"id" redis:"id"`
+		Name       string    `json:"name" redis:"name"`
+		Email      string    `json:"email" redis:"email"`
+		Password   string    `json:"-" redis:"-"`
+		ProfilePic string    `json:"profile_pic" redis:"profile_pic"`
+		CreatedAt  time.Time `json:"created_at" redis:"created_at"`
+		UpdatedAt  time.Time `json:"updated_at" redis:"updated_at"`
 	}
 )
