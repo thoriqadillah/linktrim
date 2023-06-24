@@ -17,6 +17,7 @@ type Store interface {
 	GetOne(ctx context.Context, linkID uuid.UUID) (*Link, error)
 	Update(ctx context.Context, linkID uuid.UUID, payload linkUpdate) error
 	Delete(ctx context.Context, linkID uuid.UUID) error
+	GetOriginalFromTrimmed(ctx context.Context, trimmed string) (*Link, error)
 }
 
 type entStore struct {
@@ -89,4 +90,22 @@ func (s *entStore) Update(ctx context.Context, linkID uuid.UUID, payload linkUpd
 
 func (s *entStore) Delete(ctx context.Context, linkID uuid.UUID) error {
 	return s.db.Link.DeleteOneID(linkID).Exec(ctx)
+}
+
+func (s *entStore) GetOriginalFromTrimmed(ctx context.Context, trimmed string) (*Link, error) {
+	res, err := s.db.Link.Query().
+		Where(link.TrimmedEQ(trimmed)).
+		First(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("link not found")
+	}
+
+	return &Link{
+		ID:        res.ID,
+		OwnerID:   res.OwnerID,
+		Original:  res.Original,
+		Trimmed:   trimmed,
+		CreatedAt: res.CreatedAt,
+		UpdatedAt: res.UpdatedAt,
+	}, err
 }

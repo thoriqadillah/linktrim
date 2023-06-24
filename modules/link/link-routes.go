@@ -6,11 +6,13 @@ import (
 )
 
 func Routes(r fiber.Router) {
+	r.Get("/:trimmed", trimmedRedirect)
+
 	router := r.Group("/link", middleware.Auth)
 
-	router.Get("/", GetLinks)
-	router.Get("/:id", GetOneLink)
-	router.Post("/", CreateLink)
-	router.Put("/:id", UpdateLink)
-	router.Delete("/:id", DeleteLink)
+	router.Get("/", getLinks)
+	router.Get("/:id", getOneLink)
+	router.Post("/", createLink)
+	router.Put("/:id", updateLink)
+	router.Delete("/:id", deleteLink)
 }

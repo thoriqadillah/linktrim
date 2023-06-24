@@ -8,7 +8,7 @@ import (
 
 type Cache interface {
 	Get(ctx context.Context, key string) ([]byte, error)
-	Set(ctx context.Context, key string, val []byte, duration ...time.Duration) error
+	Set(ctx context.Context, key string, val []byte, exp time.Duration) error
 	Delete(ctx context.Context, key ...string) error
 }
 

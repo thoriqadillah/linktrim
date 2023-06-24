@@ -9,6 +9,11 @@ import (
 	"github.com/thoriqadillah/linktrim/lib/env"
 )
 
+const (
+	RedisKeepTTL  = time.Duration(-1)
+	RedisInfinite = time.Duration(0)
+)
+
 type redisCache struct {
 	client *redis.Client
 }
@@ -40,12 +45,7 @@ func (c *redisCache) Get(ctx context.Context, key string) ([]byte, error) {
 	return res, nil
 }
 
-func (c *redisCache) Set(ctx context.Context, key string, value []byte, duration ...time.Duration) error {
-	exp := time.Duration(-1)
-	if len(duration) > 0 {
-		exp = duration[0]
-	}
-
+func (c *redisCache) Set(ctx context.Context, key string, value []byte, exp time.Duration) error {
 	if err := c.client.Set(ctx, key, value, exp).Err(); err != nil {
 		return fmt.Errorf("could not store into cache: %s", err.Error())
 	}

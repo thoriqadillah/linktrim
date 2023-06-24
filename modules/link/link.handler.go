@@ -13,7 +13,7 @@ import (
 
 var storer = NewStore(db.DB())
 
-func CreateLink(c *fiber.Ctx) error {
+func createLink(c *fiber.Ctx) error {
 	user := c.UserContext().Value("user").(*model.User)
 	var payload linkCreate
 
@@ -36,7 +36,7 @@ func CreateLink(c *fiber.Ctx) error {
 		JSON(helper.SuccessResponse(1))
 }
 
-func GetLinks(c *fiber.Ctx) error {
+func getLinks(c *fiber.Ctx) error {
 	user := c.UserContext().Value("user").(*model.User)
 
 	links, err := storer.GetAll(c.Context(), user.ID, helper.Paginate(c))
@@ -49,7 +49,7 @@ func GetLinks(c *fiber.Ctx) error {
 		JSON(helper.SuccessResponse(links))
 }
 
-func GetOneLink(c *fiber.Ctx) error {
+func getOneLink(c *fiber.Ctx) error {
 	id := c.Params("id")
 	linkID, err := uuid.Parse(id)
 	if err != nil {
@@ -68,7 +68,7 @@ func GetOneLink(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).
 		JSON(helper.SuccessResponse(link))
 }
-func UpdateLink(c *fiber.Ctx) error {
+func updateLink(c *fiber.Ctx) error {
 	id := c.Params("id")
 	linkID, err := uuid.Parse(id)
 	if err != nil {
@@ -93,7 +93,7 @@ func UpdateLink(c *fiber.Ctx) error {
 		JSON(helper.SuccessResponse(id))
 }
 
-func DeleteLink(c *fiber.Ctx) error {
+func deleteLink(c *fiber.Ctx) error {
 	id := c.Params("id")
 	linkID, err := uuid.Parse(id)
 	if err != nil {
@@ -109,4 +109,15 @@ func DeleteLink(c *fiber.Ctx) error {
 	}
 	return c.Status(http.StatusOK).
 		JSON(helper.SuccessResponse(id))
+}
+
+func trimmedRedirect(c *fiber.Ctx) error {
+	trimmed := c.Params("trimmed")
+	link, err := storer.GetOriginalFromTrimmed(c.Context(), trimmed)
+	if err != nil {
+		return c.Status(http.StatusNotFound).
+			JSON(helper.ErrorResponse(err.Error()))
+	}
+
+	return c.Redirect(link.Original, http.StatusTemporaryRedirect)
 }
